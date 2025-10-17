@@ -31,7 +31,9 @@ public class TicketDAO {
             ps.setDouble(3, ticket.getPrice());
             ps.setTimestamp(4, new Timestamp(ticket.getInTime().getTime()));
             ps.setTimestamp(5, (ticket.getOutTime() == null)?null: (new Timestamp(ticket.getOutTime().getTime())) );
-            return ps.execute();
+            int rowsInserted = ps.executeUpdate();
+            return rowsInserted > 0;
+
         }catch (Exception ex){
             logger.error("Error fetching next available slot",ex);
         }finally {
