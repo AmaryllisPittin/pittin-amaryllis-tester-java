@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem;
 
+
 import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.model.ParkingSpot;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 import java.util.Date;
 
@@ -38,7 +40,7 @@ public class FareCalculatorServiceTest {
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
-        
+
         fareCalculatorService.calculateFare(ticket, false);
         assertEquals(ticket.getPrice(), Fare.CAR_RATE_PER_HOUR);
     }
@@ -161,20 +163,41 @@ public class FareCalculatorServiceTest {
         assertEquals((0 * Fare.BIKE_RATE_PER_HOUR), ticket.getPrice() );
     }
 
-        @Test
+    @Test
     public void calculateFareCarWithDiscount() {
-        Date inTime = new Date(System.currentTimeMillis() - (100 * 60 * 1000));
+        Date inTime = new Date(System.currentTimeMillis() - (120 * 60 * 1000));
         Date outTime = new Date();
 
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,false);
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
-        ticket.setDiscount(true);
 
-        fareCalculatorService.calculateFare(ticket, true);
-        assertEquals((100 * Fare.CAR_RATE_PER_HOUR), ticket.getPrice() );
+        boolean isRecurringUser = true;
+        fareCalculatorService.calculateFare(ticket, isRecurringUser);
+
+        double expectedPrice = (120 / 60.0) * Fare.CAR_RATE_PER_HOUR * 0.95;
+        assertEquals(expectedPrice, ticket.getPrice(), 0.01);
     }
+
+    @Test
+    public void calculateFareBikeWithDiscount() {
+        Date inTime = new Date(System.currentTimeMillis() - (120 * 60 * 1000));
+        Date outTime = new Date();
+
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);
+
+        ticket.setInTime(inTime);
+        ticket.setOutTime(outTime);
+        ticket.setParkingSpot(parkingSpot);
+
+        boolean isRecurringUser = true;
+        fareCalculatorService.calculateFare(ticket, isRecurringUser);
+
+        double expectedPrice = (120 / 60.0) * Fare.BIKE_RATE_PER_HOUR * 0.95;
+        assertEquals(expectedPrice, ticket.getPrice(), 0.01);
+    }
+
 
 }
