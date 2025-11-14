@@ -38,14 +38,16 @@ public class ParkingServiceTest {
 
     private void setUpPerTest() throws Exception {
         try {
-            when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+            lenient().when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+            lenient().when(inputReaderUtil.readSelection()).thenReturn(1);
 
             Ticket ticket = createTicketWithOneHourInTime();
-            when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
-            when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
-            when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
+            lenient().when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
+            lenient().when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
+            //when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
 
             parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+
         } catch (Exception e) {
             e.printStackTrace();
             throw  new RuntimeException("Failed to set up test mock objects");
@@ -53,26 +55,14 @@ public class ParkingServiceTest {
     }
 
     @Test
-    public void processExitingVehicleTest() throws Exception {
-
-        Ticket ticket = createTicketWithOneHourInTime();
-        ParkingSpot parkingSpot = ticket.getParkingSpot();
-         when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
-        when(ticketDAO.getNBTicket(anyString())).thenReturn(2);
-
-        parkingService.processExitingVehicle();
-
-        verify(ticketDAO, times(1)).updateTicket(any(Ticket.class));
-        verify(parkingSpotDAO, times(1)).updateParking(parkingSpot);
-    }
-
-    @Test
     public void testProcessIncomingVehicle() throws Exception {
 
+        when(inputReaderUtil.readSelection()).thenReturn(1);
         when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+        
         when(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(1);
-        doNothing().when(ticketDAO).saveTicket(any(Ticket.class));
-
+        when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
+        when(ticketDAO.saveTicket(any(Ticket.class))).thenReturn(true);
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 
         parkingService.processIncomingVehicle();
@@ -82,6 +72,37 @@ public class ParkingServiceTest {
 
     }
 
+    @Test
+    public void processExitingVehicleTest() throws Exception {
+
+        Ticket ticket = createTicketWithOneHourInTime();
+        ParkingSpot parkingSpot = ticket.getParkingSpot();
+         when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
+        when(ticketDAO.getNBTicket(anyString())).thenReturn(2);
+        
+        parkingService.processExitingVehicle();
+
+        verify(ticketDAO, times(1)).updateTicket(any(Ticket.class));
+        verify(parkingSpotDAO, times(1)).updateParking(parkingSpot);
+    }
+
+    @Test
+    public void processExitingVehicleTestUnableUpdate() throws Exception {
+
+        Ticket ticket = createTicketWithOneHourInTime();
+
+        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+        when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
+        when(ticketDAO.getNBTicket(anyString())).thenReturn(1);
+        when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(false);
+
+        parkingService.processExitingVehicle();
+
+        verify(ticketDAO, times(1)).updateTicket(any(Ticket.class));
+        verify(parkingSpotDAO, times(0)).updateParking(any(ParkingSpot.class));
+
+
+    }
     
     private Ticket createTicketWithOneHourInTime() {
         ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
