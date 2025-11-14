@@ -18,6 +18,8 @@ import java.util.Date;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -88,6 +90,31 @@ public class ParkingServiceTest {
         assertEquals(1, parkingSpot.getId());
         assertTrue(parkingSpot.isAvailable());
         assertEquals(ParkingType.CAR, parkingSpot.getParkingType());
+
+    }
+
+    @Test
+    public void testGetNextParkingNumberIfAvailableParkingNumberNotFound() throws Exception {
+
+        when(inputReaderUtil.readSelection()).thenReturn(1);
+
+        when(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(0);
+
+        ParkingSpot parkingSpot = parkingService.getNextParkingNumberIfAvailable();
+
+        assertNull(parkingSpot);
+
+    }
+
+    @Test
+    public void testGetNextParkingNumberIfAvailableParkingNumberWrongArgument() throws Exception {
+
+        when(inputReaderUtil.readSelection()).thenReturn(3);
+
+        ParkingSpot parkingSpot = parkingService.getNextParkingNumberIfAvailable();
+
+        assertNull(parkingSpot);
+
 
     }
 
