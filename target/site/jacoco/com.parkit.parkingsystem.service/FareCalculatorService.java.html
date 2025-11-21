@@ -6,14 +6,14 @@ import com.parkit.parkingsystem.model.Ticket;
 <span class="fc" id="L6">public class FareCalculatorService {</span>
 
     public void calculateFare(Ticket ticket, boolean discount){
-<span class="pc bpc" id="L9" title="1 of 4 branches missed.">        if( (ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime())) ){</span>
-<span class="fc" id="L10">            throw new IllegalArgumentException(&quot;Out time provided is incorrect:&quot;+ticket.getOutTime().toString());</span>
+<span class="fc bfc" id="L9" title="All 4 branches covered.">        if( (ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime())) ){</span>
+<span class="fc" id="L10">            throw new IllegalArgumentException(&quot;Out time provided is incorrect:&quot;+ticket.getOutTime());</span>
         }
 
 <span class="fc" id="L13">        long durationInMillis = ticket.getOutTime().getTime() - ticket.getInTime().getTime();</span>
 <span class="fc" id="L14">        double duration = durationInMillis / (1000.00 * 60 * 60);</span>
 
-<span class="fc bfc" id="L16" title="All 2 branches covered.">        if (duration &lt; 0.5) {</span>
+<span class="fc bfc" id="L16" title="All 2 branches covered.">        if (duration &lt;= 0.5) {</span>
 <span class="fc" id="L17">            ticket.setPrice(0);</span>
 <span class="fc" id="L18">            return;</span>
         }
