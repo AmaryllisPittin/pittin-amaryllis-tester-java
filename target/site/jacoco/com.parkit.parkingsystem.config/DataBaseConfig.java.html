@@ -5,9 +5,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
 
-<span class="nc" id="L8">public class DataBaseConfig {</span>
+<span class="fc" id="L8">public class DataBaseConfig {</span>
 
-<span class="nc" id="L10">    private static final Logger logger = LogManager.getLogger(&quot;DataBaseConfig&quot;);</span>
+<span class="fc" id="L10">    private static final Logger logger = LogManager.getLogger(&quot;DataBaseConfig&quot;);</span>
 
     public Connection getConnection() throws ClassNotFoundException, SQLException {
 <span class="nc" id="L13">        logger.info(&quot;Create DB connection&quot;);</span>
@@ -15,7 +15,7 @@ import java.sql.*;
         //url=&quot;jdbc:mysql://127.0.0.1:3306/rk_tu_lager?useLegacyDatetimeCode=false&amp;amp;serverTimezone=Europe/Amsterdam&amp;amp;useSSL=false&quot;
 
 <span class="nc" id="L17">        return DriverManager.getConnection(</span>
-                &quot;jdbc:mysql://localhost:3306/prod?serverTimezone=Europe/Paris&quot;,&quot;root1&quot;,&quot;rootroot1&quot;);
+<span class="nc" id="L18">                &quot;jdbc:mysql://localhost:3306/prod?serverTimezone=Europe/Paris&quot;,&quot;root1&quot;,&quot;rootroot1&quot;);</span>
     }
 
     public void closeConnection(Connection con){
@@ -25,7 +25,7 @@ import java.sql.*;
 <span class="nc" id="L25">                logger.info(&quot;Closing DB connection&quot;);</span>
 <span class="nc" id="L26">            } catch (SQLException e) {</span>
 <span class="nc" id="L27">                logger.error(&quot;Error while closing connection&quot;,e);</span>
-<span class="nc" id="L28">            }</span>
+            }
         }
 <span class="nc" id="L30">    }</span>
 
@@ -36,7 +36,7 @@ import java.sql.*;
 <span class="nc" id="L36">                logger.info(&quot;Closing Prepared Statement&quot;);</span>
 <span class="nc" id="L37">            } catch (SQLException e) {</span>
 <span class="nc" id="L38">                logger.error(&quot;Error while closing prepared statement&quot;,e);</span>
-<span class="nc" id="L39">            }</span>
+            }
         }
 <span class="nc" id="L41">    }</span>
 
@@ -47,7 +47,7 @@ import java.sql.*;
 <span class="nc" id="L47">                logger.info(&quot;Closing Result Set&quot;);</span>
 <span class="nc" id="L48">            } catch (SQLException e) {</span>
 <span class="nc" id="L49">                logger.error(&quot;Error while closing result set&quot;,e);</span>
-<span class="nc" id="L50">            }</span>
+            }
         }
 <span class="nc" id="L52">    }</span>
 }

@@ -52,7 +52,7 @@ public class ParkingService {
             }
 <span class="fc" id="L53">        }catch(Exception e){</span>
 <span class="fc" id="L54">            logger.error(&quot;Unable to process incoming vehicle&quot;,e);</span>
-<span class="fc" id="L55">        }</span>
+        }
 <span class="fc" id="L56">    }</span>
 
     public String getVehicleRegNumber() throws Exception {
@@ -68,14 +68,14 @@ public class ParkingService {
 <span class="fc" id="L68">            parkingNumber = parkingSpotDAO.getNextAvailableSlot(parkingType);</span>
 <span class="fc bfc" id="L69" title="All 2 branches covered.">            if(parkingNumber &gt; 0){</span>
 <span class="fc" id="L70">                parkingSpot = new ParkingSpot(parkingNumber,parkingType, true);</span>
-            }else{
+<span class="fc" id="L71">            }else{</span>
 <span class="fc" id="L72">                throw new Exception(&quot;Error fetching parking number from DB. Parking slots might be full&quot;);</span>
             }
 <span class="fc" id="L74">        }catch(IllegalArgumentException ie){</span>
 <span class="fc" id="L75">            logger.error(&quot;Error parsing user input for type of vehicle&quot;, ie);</span>
 <span class="fc" id="L76">        }catch(Exception e){</span>
 <span class="fc" id="L77">            logger.error(&quot;Error fetching next available parking slot&quot;, e);</span>
-<span class="fc" id="L78">        }</span>
+        }
 <span class="fc" id="L79">        return parkingSpot;</span>
     }
 
@@ -120,7 +120,7 @@ public class ParkingService {
             }
 <span class="fc" id="L121">        }catch(Exception e){</span>
 <span class="fc" id="L122">            logger.error(&quot;Unable to process exiting vehicle&quot;,e);</span>
-<span class="fc" id="L123">        }</span>
+        }
 <span class="fc" id="L124">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

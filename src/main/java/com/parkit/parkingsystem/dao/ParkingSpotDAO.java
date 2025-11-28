@@ -19,13 +19,21 @@ public class ParkingSpotDAO {
     public int getNextAvailableSlot(ParkingType parkingType){
         Connection con = null;
         int result=-1;
+        
         try {
             con = dataBaseConfig.getConnection();
             PreparedStatement ps = con.prepareStatement(DBConstants.GET_NEXT_PARKING_SPOT);
             ps.setString(1, parkingType.toString());
             ResultSet rs = ps.executeQuery();
+
+            int minParkingNumber = -1;
+
             if(rs.next()){
-                result = rs.getInt(1);;
+                minParkingNumber = rs.getInt(1);
+            } if (!rs.wasNull()) {
+                result = minParkingNumber;
+            } else {
+                result = -1;
             }
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
@@ -40,6 +48,7 @@ public class ParkingSpotDAO {
     public boolean updateParking(ParkingSpot parkingSpot){
         //update the availability fo that parking slot
         Connection con = null;
+
         try {
             con = dataBaseConfig.getConnection();
             PreparedStatement ps = con.prepareStatement(DBConstants.UPDATE_PARKING_SPOT);
@@ -54,6 +63,48 @@ public class ParkingSpotDAO {
         }finally {
             dataBaseConfig.closeConnection(con);
         }
+    }
+
+    public ParkingSpot getParkingSpot(int id) {
+
+        Connection con = null;
+        ParkingSpot parkingSpot = null;
+        
+        try {
+
+            con = dataBaseConfig.getConnection();
+            PreparedStatement ps = con.prepareStatement(
+                "SELECT PARKING_NUMBER, TYPE, AVAILABLE FROM parking WHERE PARKING_NUMBER=?"
+            );
+            ps.setInt(1, id);
+
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()) {
+
+                int parkingNumber = rs.getInt("PARKING_NUMBER");
+                ParkingType type = ParkingType.valueOf(rs.getString("TYPE"));
+                boolean available = rs.getBoolean("AVAILABLE");
+
+                parkingSpot = new ParkingSpot(parkingNumber, type, available);
+
+            }
+
+            dataBaseConfig.closeResultSet(rs);
+            dataBaseConfig.closePreparedStatement(ps);   
+
+        } catch (Exception ex) {
+
+            logger.error("error fetching parking spot", ex);
+
+        } finally {
+
+            dataBaseConfig.closeConnection(con);
+
+        }
+
+        return parkingSpot;
+
     }
 
 }
