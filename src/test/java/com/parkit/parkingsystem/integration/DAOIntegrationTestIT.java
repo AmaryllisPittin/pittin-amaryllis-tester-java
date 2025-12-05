@@ -8,15 +8,10 @@ import com.parkit.parkingsystem.integration.service.DataBasePrepareService;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 import org.junit.jupiter.api.*;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.lenient;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DAOIntegrationTestIT {
@@ -174,7 +169,8 @@ public class DAOIntegrationTestIT {
     public void testGetNextAvailableSlot_ExceptionHandled() throws Exception {
 
         ParkingSpotDAO dao = new ParkingSpotDAO();
-        dao.dataBaseConfig = null;
+
+        dao.dataBaseConfig.getConnection().close();
         int slot = dao.getNextAvailableSlot(ParkingType.CAR);
         assertEquals(-1, slot);
 
