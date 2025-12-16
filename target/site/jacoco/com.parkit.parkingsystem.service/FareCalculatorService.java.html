@@ -5,36 +5,48 @@ import com.parkit.parkingsystem.model.Ticket;
 
 <span class="fc" id="L6">public class FareCalculatorService {</span>
 
+    /*
+    Calcul le tarif d'un ticket de parking
+    *
+    @param ticket le ticket à calculer
+    @param discount Indique si la reduction doit etre appliquee
+    @throws IllegalArgumentException si l'heure de sortie est null ou avant l'heure d'entree
+    */
+
     public void calculateFare(Ticket ticket, boolean discount){
-<span class="fc bfc" id="L9" title="All 4 branches covered.">        if( (ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime())) ){</span>
-<span class="fc" id="L10">            throw new IllegalArgumentException(&quot;Out time provided is incorrect:&quot;+ticket.getOutTime());</span>
+        // Verifie que l'heure de sortie est correcte
+<span class="fc bfc" id="L18" title="All 4 branches covered.">        if( (ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime())) ){</span>
+<span class="fc" id="L19">            throw new IllegalArgumentException(&quot;Out time provided is incorrect:&quot;+ticket.getOutTime());</span>
         }
 
-<span class="fc" id="L13">        long durationInMillis = ticket.getOutTime().getTime() - ticket.getInTime().getTime();</span>
-<span class="fc" id="L14">        double duration = durationInMillis / (1000.00 * 60 * 60);</span>
+        // Calcul de la duree de stationnement en heures
+<span class="fc" id="L23">        long durationInMillis = ticket.getOutTime().getTime() - ticket.getInTime().getTime();</span>
+<span class="fc" id="L24">        double duration = durationInMillis / (1000.00 * 60 * 60);</span>
 
-<span class="fc bfc" id="L16" title="All 2 branches covered.">        if (duration &lt;= 0.5) {</span>
-<span class="fc" id="L17">            ticket.setPrice(0);</span>
-<span class="fc" id="L18">            return;</span>
+        // Gratuit si le stationnement est inferieur ou egal a 30 minutes
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        if (duration &lt;= 0.5) {</span>
+<span class="fc" id="L28">            ticket.setPrice(0);</span>
+<span class="fc" id="L29">            return;</span>
         }
 
-<span class="pc bpc" id="L21" title="1 of 3 branches missed.">        switch (ticket.getParkingSpot().getParkingType()){</span>
+        // Calcul du prix selon le type de vehicule
+<span class="pc bpc" id="L33" title="1 of 3 branches missed.">        switch (ticket.getParkingSpot().getParkingType()){</span>
             case CAR: {
-<span class="fc" id="L23">                ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR);</span>
-<span class="fc" id="L24">                break;</span>
+<span class="fc" id="L35">                ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR);</span>
+<span class="fc" id="L36">                break;</span>
             }
             case BIKE: {
-<span class="fc" id="L27">                ticket.setPrice(duration * Fare.BIKE_RATE_PER_HOUR);</span>
-<span class="fc" id="L28">                break;</span>
+<span class="fc" id="L39">                ticket.setPrice(duration * Fare.BIKE_RATE_PER_HOUR);</span>
+<span class="fc" id="L40">                break;</span>
             }
-<span class="nc" id="L30">            default: throw new IllegalArgumentException(&quot;Unkown Parking Type&quot;);</span>
+<span class="nc" id="L42">            default: throw new IllegalArgumentException(&quot;Unknown Parking Type&quot;);</span>
         }
 
-        // Reduction
-<span class="fc bfc" id="L34" title="All 2 branches covered.">        if (discount) {</span>
-<span class="fc" id="L35">            ticket.setPrice(ticket.getPrice() * 0.95);</span>
+        // Reduction appliquee si necessaire
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        if (discount) {</span>
+<span class="fc" id="L47">            ticket.setPrice(ticket.getPrice() * 0.95);</span>
         }
 
-<span class="fc" id="L38">    }</span>
+<span class="fc" id="L50">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

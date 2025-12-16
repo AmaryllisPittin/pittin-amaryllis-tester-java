@@ -21,12 +21,27 @@ public class ParkingService {
     private ParkingSpotDAO parkingSpotDAO;
     private  TicketDAO ticketDAO;
 
+    /*
+    * Constructeur de ParkingService
+    *
+    * @param inputReaderUtil Utilitaire pour lire les entrees utilisateur
+    * @param parkingSpotDAO DAO pour acceder aux emplacements du parking
+    * @param ticketDAO DAO pour acceder aux tickets
+    */
+
     public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO){
         this.inputReaderUtil = inputReaderUtil;
         this.parkingSpotDAO = parkingSpotDAO;
         this.ticketDAO = ticketDAO;
-
     }
+
+    /*
+    *Traite l'arrivee d un vehicule :
+    * - Recupere le prochain emplacement disponible
+    *  - Demande le numero d immatriculation
+    *  - Cree le ticket et le sauvegarde dans la base de donnees
+    * - Marque l emplacement comme indisponible
+     */
 
     public void processIncomingVehicle() {
         try{
@@ -34,19 +49,18 @@ public class ParkingService {
             if(parkingSpot !=null && parkingSpot.getId() > 0){
                 String vehicleRegNumber = getVehicleRegNumber();
                 parkingSpot.setAvailable(false);
-                parkingSpotDAO.updateParking(parkingSpot);//allot this parking space and mark it's availability as false
+                parkingSpotDAO.updateParking(parkingSpot);
+                // Indique la place comme occupee
 
                 Date inTime = new Date();
                 Ticket ticket = new Ticket();
-                //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
-                //ticket.setId(ticketID);
                 ticket.setParkingSpot(parkingSpot);
                 ticket.setVehicleRegNumber(vehicleRegNumber);
                 ticket.setPrice(0);
                 ticket.setInTime(inTime);
                 ticket.setOutTime(null);
-                ticketDAO.saveTicket(ticket);
-                System.out.println("Generated Ticket and saved in DB");
+                ticketDAO.saveTicket(ticket); // Enregistre le ticket en BDD
+                System.out.println("Ticket generated and saved in the database");
                 System.out.println("Please park your vehicle in spot number:"+parkingSpot.getId());
                 System.out.println("Recorded in-time for vehicle number:"+vehicleRegNumber+" is:"+inTime);
             }
@@ -55,10 +69,22 @@ public class ParkingService {
         }
     }
 
+    /*
+    * Demande a l utilisateur le numero d immatriculation du vehicule
+    * @return numero d immatriculation saisi
+    * @throws Exception si la lecture echoue
+    */
+
     public String getVehicleRegNumber() throws Exception {
         System.out.println("Please type the vehicle registration number and press enter key");
         return inputReaderUtil.readVehicleRegistrationNumber();
     }
+
+    /*
+    * Recupere le prochain emplacement de parking disponible pour le type de vehicule inscrit
+    *
+    * @return ParkingSpot disponible ou null si aucun emplacement
+    */
 
     public ParkingSpot getNextParkingNumberIfAvailable(){
         int parkingNumber=0;
@@ -79,6 +105,12 @@ public class ParkingService {
         return parkingSpot;
     }
 
+    /*
+    *Demande a l utilisateur de choisir le type de vehicule: voiture ou moto
+    *
+    * @return le ParkingType choisi
+    */
+
     private ParkingType getVehicleType(){
         System.out.println("Please select vehicle type from menu");
         System.out.println("1 CAR");
@@ -98,21 +130,28 @@ public class ParkingService {
         }
     }
 
-    public void processExitingVehicle() {
+    /*
+    * Traite la sortie d un vehicule : 
+    * - Recupere le ticket correspondant
+    *  - Calcule le tarif avec reduction si l utilisateur est recurrent
+    *  - Met a jour le ticket et libere la place
+    */
+
+    public void processExitingVehicle(Date outTime) {
         try{
             String vehicleRegNumber = getVehicleRegNumber();
             Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
-            Date outTime = new Date();
 
+            // Verifie si le vehicule est un utilisateur recurrent
             int nbVisits = ticketDAO.getNBTicket(vehicleRegNumber);
             boolean isRecurringUser = nbVisits > 1;           
             ticket.setOutTime(outTime);
-            fareCalculatorService.calculateFare(ticket, isRecurringUser);
+            fareCalculatorService.calculateFare(ticket, isRecurringUser); // Calcule le tarif
 
             if(ticketDAO.updateTicket(ticket)) {
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
                 parkingSpot.setAvailable(true);
-                parkingSpotDAO.updateParking(parkingSpot);
+                parkingSpotDAO.updateParking(parkingSpot); // libere la place
                 System.out.println("Please pay the parking fare:" + ticket.getPrice());
                 System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
             }else{

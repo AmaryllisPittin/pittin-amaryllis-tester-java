@@ -24,6 +24,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Date;
 
 @ExtendWith(MockitoExtension.class)
 public class ParkingDataBaseIT {
@@ -79,13 +80,17 @@ public class ParkingDataBaseIT {
     }
 
     @Test
-    public void testParkingLotExit(){
+    public void testParkingLotExit() throws Exception {
 
         testParkingACar();
 
-        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+        InputReaderUtil inputReaderUtil = mock(InputReaderUtil.class);
+        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
 
-        parkingService.processExitingVehicle();
+        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+        Date outTime = new Date();
+        outTime.setTime(System.currentTimeMillis() + 45 * 60 * 1000);
+        parkingService.processExitingVehicle(outTime);
 
         Ticket ticket = ticketDAO.getTicket("ABCDEF");
         assertNotNull(ticket, "le ticket doit exister");
@@ -95,6 +100,7 @@ public class ParkingDataBaseIT {
         ParkingSpot parkingSpot = parkingSpotDAO.getParkingSpot(ticket.getParkingSpot().getId());
         assertTrue(parkingSpot.isAvailable(), "La place doit être disponible après sortie du véhicule");
 
+    
     }
 
     @Test
@@ -117,21 +123,11 @@ public class ParkingDataBaseIT {
 
             }
 
-        parkingService.processExitingVehicle();
+        parkingService.processExitingVehicle(new Date());
 
         parkingService.processIncomingVehicle();
 
-        try (Connection con = dataBaseTestConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement(
-                "UPDATE ticket SET in_time=? WHERE vehicle_reg_number=?")) {
-
-                    ps.setTimestamp(1, Timestamp.from(Instant.now().minusSeconds(3600)));
-                    ps.setString(2, "ABCDEF");
-                    ps.executeUpdate();
-
-            }
-
-        parkingService.processExitingVehicle();
+        parkingService.processExitingVehicle(new Date());
 
         Ticket secondTicket = ticketDAO.getTicket("ABCDEF");
 

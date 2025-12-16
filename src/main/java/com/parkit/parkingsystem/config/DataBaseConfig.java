@@ -9,6 +9,15 @@ public class DataBaseConfig {
 
     private static final Logger logger = LogManager.getLogger("DataBaseConfig");
 
+
+    /**
+     * Cree et retourne une connexion vers la base de donnees MySQL
+     * 
+     * @return une connexion active
+     * @throws ClassNotFoundException si le driver JDBC est introuvable
+     * @throws SQLException si la connexion echoue
+     */
+
     public Connection getConnection() throws ClassNotFoundException, SQLException {
         logger.info("Create DB connection");
         Class.forName("com.mysql.cj.jdbc.Driver"); 

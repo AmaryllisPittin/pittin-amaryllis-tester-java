@@ -5,10 +5,20 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Scanner;
 
+/**
+ * Utilitaire de lecture des entrees utilisateur depuis la console.
+ */
+
 public class InputReaderUtil {
 
     private static Scanner scan = new Scanner(System.in);
     private static final Logger logger = LogManager.getLogger("InputReaderUtil");
+
+    /**
+     * Lit une selection utilisateur depuis la console
+     * 
+     * @return le choix saisi ou -1 en cas d erreur de lecture
+     */
 
     public int readSelection() {
         try {
@@ -20,6 +30,13 @@ public class InputReaderUtil {
             return -1;
         }
     }
+
+    /**
+     * Lit le numero d immatriculation d un vehicule
+     * 
+     * @return numero d immatriculation valide
+     * @throws Exception si la saisie est vide ou invalide
+     */
 
     public String readVehicleRegistrationNumber() throws Exception {
         try {

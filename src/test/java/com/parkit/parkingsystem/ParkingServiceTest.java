@@ -230,7 +230,7 @@ public class ParkingServiceTest {
         when(ticketDAO.getNBTicket("ABCDEF")).thenReturn(2);
         when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
 
-        parkingService.processExitingVehicle();
+        parkingService.processExitingVehicle(new Date());
 
         verify(ticketDAO, times(1)).updateTicket(any(Ticket.class));
         verify(parkingSpotDAO, times(1)).updateParking(parkingSpot);
@@ -246,7 +246,7 @@ public class ParkingServiceTest {
         when(ticketDAO.getNBTicket(anyString())).thenReturn(1);
         when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(false);
 
-        parkingService.processExitingVehicle();
+        parkingService.processExitingVehicle(new Date());
 
         verify(ticketDAO, times(1)).updateTicket(any(Ticket.class));
         verify(parkingSpotDAO, times(0)).updateParking(any(ParkingSpot.class));
@@ -259,7 +259,7 @@ public class ParkingServiceTest {
         when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
         when(ticketDAO.getTicket("ABCDEF")).thenReturn(null);
 
-        parkingService.processExitingVehicle();
+        parkingService.processExitingVehicle(new Date());
 
         verify(ticketDAO, times(0)).updateTicket(any());
         verify(parkingSpotDAO, times(0)).updateParking(any());
@@ -282,7 +282,7 @@ public class ParkingServiceTest {
         field.setAccessible(true);
         field.set(parkingService, fareCalculatorServiceMock);
 
-        parkingService.processExitingVehicle();
+        parkingService.processExitingVehicle(new Date());
 
         verify(ticketDAO, times(0)).updateTicket(any());
         verify(parkingSpotDAO, times(0)).updateParking(any());
@@ -299,7 +299,7 @@ public class ParkingServiceTest {
         when(ticketDAO.getNBTicket("ABCDEF")).thenReturn(1);
         when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
 
-        parkingService.processExitingVehicle();
+        parkingService.processExitingVehicle(new Date());
 
         verify(ticketDAO, times(1)).updateTicket(any());
         verify(parkingSpotDAO, times(1)).updateParking(any());

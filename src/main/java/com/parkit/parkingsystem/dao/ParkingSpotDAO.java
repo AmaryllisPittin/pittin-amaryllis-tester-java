@@ -11,10 +11,22 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+/**
+* DAO responsable de l'acces aux donnees liees aux emplacements de parking.
+*/
+
 public class ParkingSpotDAO {
     private static final Logger logger = LogManager.getLogger("ParkingSpotDAO");
 
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
+
+    /**
+     * Recupere le numero du prochain emplacement disponible
+     * pour un type de vehicule donne
+     * 
+     * @param parkingType type de vehicule (CAR ou BIKE)
+     * @return numero de l emplacement disponible ou -1 si aucun n est disponible
+     */
 
     public int getNextAvailableSlot(ParkingType parkingType){
         Connection con = null;
@@ -28,6 +40,7 @@ public class ParkingSpotDAO {
 
             int minParkingNumber = -1;
 
+            // Recupere le plus petit numero de place disponible
             if(rs.next()){
                 minParkingNumber = rs.getInt(1);
             } if (!rs.wasNull()) {
@@ -45,8 +58,15 @@ public class ParkingSpotDAO {
         return result;
     }
 
+    /**
+     * Met a jour la disponibilite d un emplacement de parking
+     * 
+     * @param parkingSpot emplacement a mettre a jour
+     * @return true si la mise a jour est reussie, false dans le cas contraire
+     */
+
     public boolean updateParking(ParkingSpot parkingSpot){
-        //update the availability fo that parking slot
+        
         Connection con = null;
 
         try {
@@ -56,6 +76,7 @@ public class ParkingSpotDAO {
             ps.setInt(2, parkingSpot.getId());
             int updateRowCount = ps.executeUpdate();
             dataBaseConfig.closePreparedStatement(ps);
+            //Une seule ligne doit etre modifiee
             return (updateRowCount == 1);
         }catch (Exception ex){
             logger.error("Error updating parking info",ex);
@@ -64,6 +85,13 @@ public class ParkingSpotDAO {
             dataBaseConfig.closeConnection(con);
         }
     }
+
+    /**
+     * Recupere un emplacement de parking a l aide de son identifiant
+     * 
+     * @param id identifiant de l emplacement
+     * @return ParkingSpot correspondant ou null s il n existe pas
+     */
 
     public ParkingSpot getParkingSpot(int id) {
 
@@ -86,6 +114,7 @@ public class ParkingSpotDAO {
                 ParkingType type = ParkingType.valueOf(rs.getString("TYPE"));
                 boolean available = rs.getBoolean("AVAILABLE");
 
+                // Creation de l objet metier a partir du resultat SQL
                 parkingSpot = new ParkingSpot(parkingNumber, type, available);
 
             }
